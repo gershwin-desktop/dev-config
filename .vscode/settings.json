@@ -1,0 +1,17 @@
+{
+  "C_Cpp.intelliSenseEngine": "Disabled",
+  "clangd.path": "./clangd-gnustep",
+  "clangd.arguments": [
+    "--background-index",
+    "--clang-tidy",
+    "--header-insertion=never",
+    "--completion-style=detailed"
+  ],
+  "editor.formatOnSave": true,
+  "[objective-c]": {
+    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+  },
+  "[objective-cpp]": {
+    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+  }
+}
