@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# List of staged Objective-C files
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(m|mm|h)$')
+
+if [ -z "$FILES" ]; then
+  exit 0
+fi
+
+FORMAT_FAILED=0
+TIDY_FAILED=0
+
+echo "🔍 Running clang-format..."
+
+for file in $FILES; do
+  clang-format -i "$file"
+  git add "$file"
+done
+
+echo "🔍 Running clang-tidy..."
+
+for file in $FILES; do
+  clang-tidy "$file" --quiet --warnings-as-errors='*' -- -I. > /tmp/clang-tidy-output.txt 2>&1
+  if [ $? -ne 0 ]; then
+    echo "❌ clang-tidy failed for $file:"
+    cat /tmp/clang-tidy-output.txt
+    TIDY_FAILED=1
+  fi
+done
+
+rm -f /tmp/clang-tidy-output.txt
+
+if [ "$TIDY_FAILED" -ne 0 ]; then
+  echo ""
+  echo "❌ Commit blocked due to clang-tidy errors."
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed."
+exit 0
+
