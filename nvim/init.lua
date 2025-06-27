@@ -94,7 +94,7 @@ require("lazy").setup({
     config = function()
       require("lspconfig").clangd.setup({
         cmd = {
-          "clangd-gnustep",
+          "clangd",
           "--clang-tidy",             -- enables clang-tidy diagnostics
           "--header-insertion=never", -- optional: cleaner includes
           "--completion-style=detailed",
