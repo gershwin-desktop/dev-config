@@ -29,8 +29,8 @@ What the neovim config will give you
 
 For VSCode users you need to make sure you have the following extensions installed
 
-- `C/C++` by Microsoft (ms-vscode.cpptools)
-- `Clangd` (llvm-vs-code-extensions.vscode-clangd)
+- `C/C++` by Microsoft (ms-vscode.cpptools) DO NOT ENABLE THIS
+- `Clangd` (llvm-vs-code-extensions.vscode-clangd) ENABLE THIS ONE
 
 Then drop the `vscode` directory from this repo into the root directory of your project repo
 
