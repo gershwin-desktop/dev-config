@@ -17,6 +17,14 @@ These files will provide the linting and formatting to make code style consisten
 
 The put the contents of the nvim directory where your nvim configs live on your platform. On Gershwin it will be `$HOME/.config/nvim`
 
+What the neovim config will give you
+
+- Objective C Diagnostics via clangd
+- Formatting via clang-format & clang-tidy (use <leader>f | leader is usually `\`)
+- Code folding is configured but not working yet on Objective C Files (treesitter bug does not recognize ObjC methods)
+- Color scheme (if you don't like Dracula theme it is easy enough to swap out. Just check the init.lua file)
+- lazy.vim for plugin management
+
 ## VSCode
 
 For VSCode users you need to make sure you have the following extensions installed
