@@ -19,6 +19,13 @@ vim.filetype.add({
   }
 })
 
+-- NOOB friendly autoinsert mode
+vim.api.nvim_create_autocmd("BufReadPost", {
+  callback = function()
+    vim.cmd("startinsert")
+  end,
+})
+
 -- Keymapping
 vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", { desc = "LSP Hover" })
 vim.keymap.set("n", "<leader>e", "<cmd>Lspsaga show_line_diagnostics<CR>", { desc = "Show diagnostics" })
@@ -129,28 +136,32 @@ require("lazy").setup({
   event = "InsertEnter",
   config = function()
     local npairs = require("nvim-autopairs")
+    local Rule = require("nvim-autopairs.rule")
 
     npairs.setup({
-      check_ts = true,  -- enable Treesitter integration if available
+      check_ts = true,
     })
 
-    -- Enable < > pairing in XML, HTML, SVG, XIB
+    -- Define the base rule for < > pairing in XML-like filetypes
+    npairs.add_rule(
+      Rule("<", ">", { "xml", "html", "svg", "xib" })
+    )
+
+    -- Then customize the rule
     npairs.get_rule("<")
       :with_pair(function(_opts)
         local ft = vim.bo.filetype
         return ft == "xml" or ft == "html" or ft == "svg" or ft == "xib"
       end)
 
-    -- Enable < > pairing ONLY inside #include or #import lines in Objective-C/C
-    npairs.add_rules({
-      require("nvim-autopairs.rule")("<", ">")
+    -- Add custom rule for #include / #import lines
+    npairs.add_rule(
+      Rule("<", ">", { "c", "cpp", "objc", "objcpp" })
         :with_pair(function(opts)
           local line = vim.api.nvim_get_current_line()
-          return vim.bo.filetype == "objc" or vim.bo.filetype == "c" or vim.bo.filetype == "cpp"
-            and line:match("^%s*#%s*include%s*<")
-                or line:match("^%s*#%s*import%s*<")
+          return line:match("^%s*#%s*include%s*<") or line:match("^%s*#%s*import%s*<")
         end)
-    })
+    )
   end,
 },
 
