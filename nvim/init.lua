@@ -19,12 +19,12 @@ vim.filetype.add({
   }
 })
 
--- NOOB friendly autoinsert mode
-vim.api.nvim_create_autocmd("BufReadPost", {
-  callback = function()
-    vim.cmd("startinsert")
-  end,
-})
+-- NOOB friendly autoinsert mode (uncomment to enable)
+-- vim.api.nvim_create_autocmd("BufReadPost", {
+--   callback = function()
+--     vim.cmd("startinsert")
+--   end,
+-- })
 
 -- Keymapping
 vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", { desc = "LSP Hover" })
