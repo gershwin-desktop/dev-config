@@ -21,7 +21,7 @@ What the neovim config will give you
 
 - Objective C Diagnostics via clangd
 - Formatting via clang-format & clang-tidy (use <leader>f | leader is usually `\`)
-- Code folding is configured but not working yet on Objective C Files (treesitter bug does not recognize ObjC methods)
+- Code folding (use `<leader>w` to collapse | `<leader>s` to expand | `<leader>W` to collapse all | `<leader>S` to expand all)
 - Color scheme (if you don't like Dracula theme it is easy enough to swap out. Just check the init.lua file)
 - lazy.vim for plugin management
 
