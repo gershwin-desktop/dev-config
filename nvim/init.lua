@@ -6,6 +6,7 @@ if not vim.loop.fs_stat(lazypath) then
     "https://github.com/folke/lazy.nvim.git", lazypath
   })
 end
+
 vim.opt.rtp:prepend(lazypath)
 
 vim.opt.termguicolors = true
@@ -33,10 +34,11 @@ vim.cmd([[
 -- Code Folding
 vim.opt.foldmethod = "expr"
 vim.o.signcolumn = "yes" -- Keeps fold indicator on the left
---vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+
 vim.opt.foldenable = true
 vim.opt.foldlevel = 99  -- all open by default
 vim.opt.fillchars = { foldopen = "▼", foldclose = "▶", fold = " " }
+
 -- Remap default folding keymap
 vim.keymap.set("n", "<leader>d", "za", { desc = "Toggle fold" })
 vim.keymap.set("n", "<leader>s", "zo", { desc = "Open fold" })
@@ -44,8 +46,7 @@ vim.keymap.set("n", "<leader>w", "zc", { desc = "Close fold" })
 vim.keymap.set("n", "<leader>S", "zR", { desc = "Open all folds" })
 vim.keymap.set("n", "<leader>W", "zM", { desc = "Close all folds" })
 
--- PLUGINS
--- Load plugins using lazy.nvim
+-- PLUGINS via Lazy.Vim
 require("lazy").setup({
   { "nvim-lua/plenary.nvim" },
 
@@ -69,7 +70,7 @@ require("lazy").setup({
           "--header-insertion=never", -- optional: cleaner includes
           "--completion-style=detailed",
           "--all-scopes-completion",
-          "--background-index",
+
         },
         filetypes = { "objc", "objcpp", "c", "cpp" },
       })
@@ -121,6 +122,38 @@ require("lazy").setup({
 
     end,
   },
+
+  -- Autocomplete pairs eg. quotes, brackets, etc.
+{
+  "windwp/nvim-autopairs",
+  event = "InsertEnter",
+  config = function()
+    local npairs = require("nvim-autopairs")
+
+    npairs.setup({
+      check_ts = true,  -- enable Treesitter integration if available
+    })
+
+    -- Enable < > pairing in XML, HTML, SVG, XIB
+    npairs.get_rule("<")
+      :with_pair(function(_opts)
+        local ft = vim.bo.filetype
+        return ft == "xml" or ft == "html" or ft == "svg" or ft == "xib"
+      end)
+
+    -- Enable < > pairing ONLY inside #include or #import lines in Objective-C/C
+    npairs.add_rules({
+      require("nvim-autopairs.rule")("<", ">")
+        :with_pair(function(opts)
+          local line = vim.api.nvim_get_current_line()
+          return vim.bo.filetype == "objc" or vim.bo.filetype == "c" or vim.bo.filetype == "cpp"
+            and line:match("^%s*#%s*include%s*<")
+                or line:match("^%s*#%s*import%s*<")
+        end)
+    })
+  end,
+},
+
 
   -- Error Tooltips
   {
@@ -198,9 +231,17 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     vim.lsp.buf.format()
   end,
 })
+
 vim.keymap.set("n", "<leader>f", function()
   vim.lsp.buf.format()
 end, { desc = "Format current buffer with LSP" })
+
+vim.opt.expandtab = true       -- Convert tabs to spaces
+vim.opt.shiftwidth = 2         -- Indent by 2 spaces
+vim.opt.tabstop = 2            -- 1 tab = 2 spaces visually
+vim.opt.smartindent = true     -- Smart indent after braces
+vim.opt.autoindent = true      -- Copy indentation from previous line
+
 
 -- Reset terminal modes on exit
 vim.api.nvim_create_autocmd("VimLeave", {

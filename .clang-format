@@ -9,7 +9,8 @@ UseTab: Never
 IndentCaseLabels: true
 
 # Braces
-BreakBeforeBraces: Allman
+# BreakBeforeBraces: Allman
+BreakBeforeBraces: Stroustrup
 AllowShortFunctionsOnASingleLine: Inline
 AlwaysBreakBeforeMultilineStrings: false
 
