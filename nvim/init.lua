@@ -32,7 +32,8 @@ vim.cmd([[
 
 -- Code Folding
 vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.o.signcolumn = "yes" -- Keeps fold indicator on the left
+--vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 vim.opt.foldenable = true
 vim.opt.foldlevel = 99  -- all open by default
 vim.opt.fillchars = { foldopen = "▼", foldclose = "▶", fold = " " }
@@ -43,32 +44,32 @@ vim.keymap.set("n", "<leader>w", "zc", { desc = "Close fold" })
 vim.keymap.set("n", "<leader>S", "zR", { desc = "Open all folds" })
 vim.keymap.set("n", "<leader>W", "zM", { desc = "Close all folds" })
 -- Help detect Objective C methods
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "objc", "objcpp" },
-  callback = function()
-    vim.opt_local.foldmethod = "expr"
-    vim.opt_local.foldexpr = "v:lua.ObjCFoldExpr()"
-    vim.opt_local.foldenable = true
-    vim.opt_local.foldlevel = 99
-  end,
-})
-
-function _G.ObjCFoldExpr()
-  local lnum = vim.v.lnum
-  local line = vim.fn.getline(lnum)
-
-  -- Start of a method implementation
-  if line:match("^%s*[-+]%s*%b()%s*{") then
-    return "a1"
-  end
-
-  -- End of a method or block
-  if line:match("^%s*}%s*$") then
-    return "s1"
-  end
-
-  return "=" -- keep previous fold level
-end
+--vim.api.nvim_create_autocmd("FileType", {
+--  pattern = { "objc", "objcpp" },
+--  callback = function()
+--    vim.opt_local.foldmethod = "expr"
+--    vim.opt_local.foldexpr = "v:lua.ObjCFoldExpr()"
+--    vim.opt_local.foldenable = true
+--    vim.opt_local.foldlevel = 99
+--  end,
+--})
+--
+--function _G.ObjCFoldExpr()
+--  local lnum = vim.v.lnum
+--  local line = vim.fn.getline(lnum)
+--
+--  -- Start of a method implementation
+--  if line:match("^%s*[-+]%s*%b()%s*{") then
+--    return "a1"
+--  end
+--
+--  -- End of a method or block
+--  if line:match("^%s*}%s*$") then
+--    return "s1"
+--  end
+--
+--  return "=" -- keep previous fold level
+--end
 
 
 
@@ -120,6 +121,45 @@ require("lazy").setup({
         },
       })
     end
+  },
+
+  -- UFO for folding
+  {
+    "kevinhwang91/nvim-ufo",
+    dependencies = { "kevinhwang91/promise-async" },
+    config = function()
+      require("ufo").setup({
+        fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
+          local newVirtText = {}
+      
+          local foldedLines = endLnum - lnum
+          local preview = string.format("+--- %d lines: ", foldedLines)
+          --local preview = string.format("+%d", foldedLines)
+      
+          -- Insert the preview *before* any existing chunks
+          table.insert(newVirtText, { preview, "Comment" })
+      
+          -- You can optionally append part of the original line
+          local suffixWidth = vim.fn.strdisplaywidth(preview)
+          local targetWidth = width - suffixWidth
+          local curWidth = 0
+      
+          for _, chunk in ipairs(virtText) do
+            local chunkText = chunk[1]
+            local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+            if targetWidth > curWidth + chunkWidth then
+              table.insert(newVirtText, chunk)
+              curWidth = curWidth + chunkWidth
+            else
+              break -- don't add any more chunks
+            end
+          end
+      
+          return newVirtText
+        end,
+      })
+
+    end,
   },
 
   -- Error Tooltips
